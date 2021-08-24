@@ -4,3 +4,4 @@ pandas
 skimage
 imutils
 sklearn
+segmentation-models

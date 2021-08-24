@@ -4,7 +4,7 @@ Semantic segmentation is a computer vision task where we classify each and every
 
 Demo of semantic segmentation (GIF from [PyImageSearch](https://www.pyimagesearch.com/2018/09/03/semantic-segmentation-with-opencv-and-deep-learning/))
 
-![segmentation example](images\opencv_semantic_segmentation_animation.gif)
+![segmentation example](images/opencv_semantic_segmentation_animation.gif)
 
 # COCO API Installation
 COCO API is used to load the COCO JSON annotation format and create masks if necessary.
