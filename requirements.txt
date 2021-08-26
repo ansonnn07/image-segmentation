@@ -5,3 +5,4 @@ skimage
 imutils
 sklearn
 segmentation-models
+label-studio
