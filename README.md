@@ -21,7 +21,16 @@ There are 3 notebooks used in this GitHub Repo.
 
     The third Jupyter notebook shows how to use the `segmentation_models` library ([GitHub link](https://github.com/qubvel/segmentation_models)) to easily use pre-built architectures such as U-net, LinkNet etc. The notebook was also used in Google Colab for faster training. It can be accessed directly in Google Colab here too: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1dcQ_p3CVytqnUrvl3Xie4JbDqS5Q031M?usp=sharing)
 
-# COCO API Installation
+# Installation
+
+You only need to install the requirements specified in the `requirements.txt` file using the command below:
+```
+pip install -r requirements.txt
+```
+
+And you also need to install COCO API to use it to create masks. Refer to the instructions below.
+
+## COCO API Installation
 COCO API is used to load the COCO JSON annotation format and create masks if necessary. If you are using Label Studio to label the masks, then you will need to install this library for generating the mask images to use for training.
 
 For Windows:
