@@ -36,11 +36,12 @@ def getClassName(classID):
 IS_CHECKING = True
 SHOW_COCO_MASKS = False
 FIGSIZE = (10, 5)
-MASK_DIR = os.path.join("dataset", "masks")
+DATASET_DIR = "sample_dataset"
+MASK_DIR = os.path.join(DATASET_DIR, "masks")
 if not os.path.exists(MASK_DIR):
     os.makedirs(MASK_DIR)
 
-json_path = r"dataset\result.json"
+json_path = os.path.join(DATASET_DIR, "result.json")
 json_file = json.loads(open(json_path).read())
 # print(json_file)
 img_dict_list = json_file["images"]
@@ -90,7 +91,7 @@ for (i, (className, color)) in enumerate(zip(CLASSES, COLORS)):
     cv2.rectangle(legend, (100, (i * 25)), (300, (i * 25) + 25), tuple(color), -1)
 
 for i, img_dict in enumerate(img_dict_list):
-    img_path = os.path.join("dataset", img_dict["file_name"])
+    img_path = os.path.join(DATASET_DIR, img_dict["file_name"])
     filename = os.path.basename(img_path)
 
     annIds = coco.getAnnIds(imgIds=img_dict["id"], catIds=catIDs, iscrowd=None)
