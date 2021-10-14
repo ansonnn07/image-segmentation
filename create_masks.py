@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 import os
 import sys
+import imutils
 from skimage import io
 import matplotlib.pyplot as plt
 from IPython.display import display
@@ -15,7 +16,7 @@ matplotlib.use("tkagg")
 
 
 # def get_mask(row, shape):
-## https://github.com/sam-watts/futoshiki-solver/blob/v2.0/puzzle_segmentation/semantic_seg.ipynb
+# https://github.com/sam-watts/futoshiki-solver/blob/v2.0/puzzle_segmentation/semantic_seg.ipynb
 #     row = json.loads(row)
 #     coords = np.array(
 #         [[x, y] for x, y in zip(row["all_points_x"], row["all_points_y"])]
@@ -36,10 +37,11 @@ def getClassName(classID):
 IS_CHECKING = True
 SHOW_COCO_MASKS = False
 FIGSIZE = (10, 5)
-DATASET_DIR = "sample_dataset"
-MASK_DIR = os.path.join(DATASET_DIR, "masks")
-if not os.path.exists(MASK_DIR):
-    os.makedirs(MASK_DIR)
+DATASET_DIR = "dataset/sample_multiclass"
+IMAGE_DIR = os.path.join(DATASET_DIR, "images")
+OUTPUT_MASK_DIR = os.path.join(DATASET_DIR, "masks")
+if not os.path.exists(OUTPUT_MASK_DIR):
+    os.makedirs(OUTPUT_MASK_DIR)
 
 json_path = os.path.join(DATASET_DIR, "result.json")
 json_file = json.loads(open(json_path).read())
@@ -74,25 +76,26 @@ COLORS = np.random.randint(0, 255, size=(len(CLASSES) - 1, 3), dtype=np.uint8)
 COLORS = np.vstack([[0, 0, 0], COLORS]).astype(np.uint8)
 
 # initialize the legend visualization
-legend = np.zeros(((len(CLASSES) * 25) + 25, 300, 3), dtype=np.uint8)
+legend = np.zeros(((len(CLASSES) * 25) + 25, 350, 3), dtype=np.uint8)
 # loop over the class names + colors
 for (i, (className, color)) in enumerate(zip(CLASSES, COLORS)):
     # draw the class name + color on the legend
     color = [int(c) for c in color]
     cv2.putText(
         legend,
-        className,
+        f"{className} ({i})",
         (5, (i * 25) + 17),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.5,
         (0, 0, 255),
         2,
     )
-    cv2.rectangle(legend, (100, (i * 25)), (300, (i * 25) + 25), tuple(color), -1)
+    cv2.rectangle(legend, (150, (i * 25)),
+                  (350, (i * 25) + 25), tuple(color), -1)
 
 for i, img_dict in enumerate(img_dict_list):
-    img_path = os.path.join(DATASET_DIR, img_dict["file_name"])
-    filename = os.path.basename(img_path)
+    filename = os.path.basename(img_dict["file_name"])
+    img_path = os.path.join(IMAGE_DIR, filename)
 
     annIds = coco.getAnnIds(imgIds=img_dict["id"], catIds=catIDs, iscrowd=None)
     anns = coco.loadAnns(annIds)
@@ -118,7 +121,8 @@ for i, img_dict in enumerate(img_dict_list):
 
     if not IS_CHECKING:
         # save the mask images
-        mask_path = os.path.join(MASK_DIR, filename)
+        mask_filename = os.path.splitext(filename)[0] + ".png"
+        mask_path = os.path.join(OUTPUT_MASK_DIR, mask_filename)
         cv2.imwrite(mask_path, mask)
     else:
         if i == 5:
@@ -129,10 +133,10 @@ for i, img_dict in enumerate(img_dict_list):
             f"Unique pixel values = {np.unique(mask)} | "
             f"Classes found = {classes_found}"
         )
-        ## check one hot mask
+        # check one hot mask
         # print(cv2.resize(tf.one_hot(mask, len(CLASSES)).numpy(), (16, 16)).shape)
 
-        ## plot using matplotlib with colorbar (optional)
+        # plot using matplotlib with colorbar (optional)
         # img = io.imread(img_path)
         # plt.figure(figsize=FIGSIZE)
         # plt.title(filename)
@@ -144,7 +148,7 @@ for i, img_dict in enumerate(img_dict_list):
         # fig.colorbar(ax, ticks=np.arange(len(CLASSES)))
         # plt.show()
 
-        ## show original and grayscale mask side by side
+        # show original and grayscale mask side by side
         # mask = np.expand_dims(mask, axis=-1)
         # mask = np.concatenate([mask, mask, mask], axis=-1)
         # img = img.astype(np.uint8)
@@ -165,7 +169,8 @@ for i, img_dict in enumerate(img_dict_list):
         # the class IDs to its corresponding color
         colored_mask = COLORS[mask.astype(np.uint8)]
         colored_mask = cv2.resize(
-            colored_mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST
+            colored_mask, (img.shape[1], img.shape[0]
+                           ), interpolation=cv2.INTER_NEAREST
         )
         # perform a weighted combination of the input image with the colored_mask to
         # form an output visualization with different colors for each class
